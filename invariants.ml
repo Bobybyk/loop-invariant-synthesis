@@ -36,7 +36,10 @@ let rec str_of_term t =
   | Add(term1, term2) -> "(+ " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
   | Mult(term1, term2) -> "(* " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
 
-let str_of_test t = "TODO" (* À compléter *)
+let str_of_test t = 
+  match t with
+  | Equals(term1, term2) -> "(= " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
+  | _ -> failwith("unrecognized arg")
 
 let string_repeat s n =
   Array.fold_left (^) "" (Array.make n s)
