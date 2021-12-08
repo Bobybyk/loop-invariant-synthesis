@@ -1,0 +1,4 @@
+invariants
+*.invariants.cmi
+*.invariants.cmx
+*.invariants.o

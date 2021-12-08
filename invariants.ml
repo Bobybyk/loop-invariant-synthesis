@@ -29,7 +29,14 @@ let x n = "x" ^ string_of_int n
   Par exemple, str_of_term (Var 3) retourne "x3", str_of_term (Add
    (Var 1, Const 3)) retourne "(+ x1 3)" et str_of_test (Equals (Var
    2, Const 2)) retourne "(= x2 2)".  *)
-let rec str_of_term t = "TODO" (* À compléter *)
+let rec str_of_term t = 
+  match t with
+  | Const e -> string_of_int e
+  | Var e -> x e
+  | Add(term1, term2) -> "(+ " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
+  | Mult(term1, term2) -> "(* " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"    
+  | _ -> failwith("empty")
+
 
 let str_of_test t = "TODO" (* À compléter *)
 
