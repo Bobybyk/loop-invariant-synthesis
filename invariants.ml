@@ -34,9 +34,7 @@ let rec str_of_term t =
   | Const e -> string_of_int e
   | Var e -> x e
   | Add(term1, term2) -> "(+ " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
-  | Mult(term1, term2) -> "(* " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"    
-  | _ -> failwith("empty")
-
+  | Mult(term1, term2) -> "(* " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
 
 let str_of_test t = "TODO" (* À compléter *)
 
