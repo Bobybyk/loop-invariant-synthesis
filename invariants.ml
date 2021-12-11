@@ -49,7 +49,14 @@ let string_repeat s n =
    exprime que le tuple (t1, ..., tk) est dans l'invariant.  Par
    exemple, str_condition [Var 1; Const 10] retourne "(Invar x1 10)".
    *)
-let str_condition l = "TODO" (* À compléter *)
+
+let rec str_condition_bis l str =
+  match l with 
+  | [] -> str
+  | e::l' -> str ^ " " ^ str_of_term e ^ str_condition_bis l' str
+
+let str_condition l = "(Invar" ^ str_condition_bis l "" ^ ")"
+
 
 (* Question 3. Écrire une fonction str_assert_for_all qui prend en
    argument un entier n et une chaîne de caractères s, et retourne
