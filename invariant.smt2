@@ -3,16 +3,16 @@
 (declare-fun Invar (Int Int) Bool)
 
 ; on s'assure que Invar contienne la configuration initiale
-(assert (Invar 0 1))
+(assert (Invar 0 0))
 
 ; on vérifie que Invar soit un invariant de boucle
-(assert (forall ((x Int) (y Int))
-	(=> (and (Invar x y) (< x 3)) (Invar (+ x 3) (+ y 1)))))
+(assert (forall ((i Int) (v Int))
+	(=> (and (Invar i v) (< i 3)) (Invar (+ i 1) (+ v 3)))))
 
 ; on s'assure que l'Invariant soit sûr : 
 ; si pout tout x, y dans l'invariant && x>= 10, alors y<10
-(assert (forall ((x Int) (y Int ))
-	(=> (and (Invar x y) (>= x 3)) (< y 3))))
+(assert (forall ((i Int) (v Int ))
+	(=> (and (Invar i v) (>= i 3)) (= v 9))))
 
 ; on fait appel au solveur pour vérifier la satisfiabilité
 ; des 3 conjonctions
