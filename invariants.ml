@@ -68,7 +68,10 @@ let str_condition l = "(Invar" ^ str_condition_bis l "" ^ ")"
 
 let str_assert s = "(assert " ^ s ^ ")"
 
-let str_assert_forall n s = "TODO" (* À compléter *)
+let str_assert_forall n s = 
+        let rec build_variables i = 
+                if i > 0 then "(x" ^ (string_of_int (n-(i-1)) ) ^ " Int) " ^ build_variables (i-1)  else ""
+        in "(forall ("^ (build_variables n)  ^ s ^"))";;
 
 (* Question 4. Nous donnons ci-dessous une définition possible de la
    fonction smt_lib_of_wa. Complétez-la en écrivant les définitions de
@@ -87,7 +90,7 @@ let smtlib_of_wa p =
     ^str_assert (str_condition p.inits) in
   let assertion_condition p =
     "; l'assertion finale est vérifiée\n"
-    ^"TODO" (* À compléter *) in
+    ^ "TODO" (* À compléter *) in
   let call_solver =
     "; appel au solveur\n(check-sat-using (then qe smt))\n(get-model)\n(exit)\n" in
   String.concat "\n" [declare_invariant p.nvars;
