@@ -39,7 +39,7 @@ let rec str_of_term t =
 let str_of_test t = 
   match t with
   | Equals(term1, term2) -> "(= " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
-  | _ -> failwith("unrecognized arg")
+  | LessThan(term1, term2) -> "(< " ^ str_of_term term1 ^ " " ^ str_of_term term2 ^ ")"
 
 let string_repeat s n =
   Array.fold_left (^) "" (Array.make n s)
