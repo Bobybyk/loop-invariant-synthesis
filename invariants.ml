@@ -95,7 +95,7 @@ let smtlib_of_wa p =
     ^str_assert (str_condition p.inits) in
   let assertion_condition p =
     "; l'assertion finale est vérifiée\n"
-    ^ str_assert_forall p.nvars ("(=> (and "^ (str_of_reverse_test p.loopcond)^ (str_of_test p.assertion)  ^"))" )  in
+    ^ str_assert_forall p.nvars ("(=> (and "^ str_condition p.mods  ^ (str_of_reverse_test p.loopcond)^ (str_of_test p.assertion)  ^"))" )  in
   let call_solver =
     "; appel au solveur\n(check-sat-using (then qe smt))\n(get-model)\n(exit)\n" in
   String.concat "\n" [declare_invariant p.nvars;
