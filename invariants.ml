@@ -79,7 +79,7 @@ let str_assert s = "(assert " ^ s ^ ")"
 let str_assert_forall n s = 
         let rec build_variables i = 
                 if i > 0 then "(x" ^ (string_of_int (n-(i-1)) ) ^ " Int) " ^ build_variables (i-1)  else ""
-        in "(assert(forall ("^ (build_variables n) ^ ")"  ^ s ^")))";;
+        in "(assert(forall ("^ (build_variables n) ^ ")"  ^ s ^")";;
 
 (* Question 4. Nous donnons ci-dessous une définition possible de la
    fonction smt_lib_of_wa. Complétez-la en écrivant les définitions de
@@ -92,13 +92,13 @@ let smtlib_of_wa p =
     ^"(declare-fun Invar (" ^ string_repeat "Int " n ^  ") Bool)" in
   let loop_condition p =
     "; la relation Invar est un invariant de boucle\n"
-    ^ str_assert_forall p.nvars ("=> (and" ^ (invar p.nvars) ^ str_of_test p.loopcond) (* doing *) in
+    ^ str_assert_forall p.nvars ("(=> (and" ^ (invar p.nvars) ^ str_of_test p.loopcond) ^ str_condition p.mods ^ ")))"(* doing *) in
   let initial_condition p =
     "; la relation Invar est vraie initialement\n"
     ^str_assert (str_condition p.inits) in
   let assertion_condition p =
     "; l'assertion finale est vérifiée\n"
-    ^ str_assert_forall p.nvars ("(=> (and "^ str_condition p.mods  ^ (str_of_reverse_test p.loopcond)^ (str_of_test p.assertion)  ^"))" )  in
+    ^ str_assert_forall p.nvars ("(=> (and "^ (invar p.nvars)  ^ (str_of_reverse_test p.loopcond) ^ ")" ^ (str_of_test p.assertion)  ^"))" )  in
   let call_solver =
     "; appel au solveur\n(check-sat-using (then qe smt))\n(get-model)\n(exit)\n" in
   String.concat "\n" [declare_invariant p.nvars;
@@ -113,13 +113,17 @@ let p1 = {nvars = 2;
           loopcond = LessThan ((Var 1),(Const 3));
           assertion = Equals ((Var 2),(Const 9))}
 
-
-let () = Printf.printf "%s" (smtlib_of_wa p1)
-
 (* Question 5. Vérifiez que votre implémentation donne un fichier
    SMTLIB qui est équivalent au fichier que vous avez écrit à la main
    dans l'exercice 1. Ajoutez dans la variable p2 ci-dessous au moins
    un autre programme test, et vérifiez qu'il donne un fichier SMTLIB
    de la forme attendue. *)
 
-let p2 = None (* À compléter *)
+let p2 = {nvars = 9;
+          inits = [(Const 3) ; (Const 1)];
+          mods = [Add ((Var 1), (Const 1)); Mult ((Var 2), (Const 2))];
+          loopcond = LessThan ((Var 1),(Const 600));
+          assertion = Equals ((Var 2),(Const 500))}
+          
+let () = Printf.printf "%s" (smtlib_of_wa p2)
+
