@@ -22,6 +22,7 @@ type program = {nvars : int;
 
 let x n = "x" ^ string_of_int n
 
+
 (* Question 1. Écrire des fonctions `str_of_term` et `str_of_term` qui
    convertissent des termes et des tests en chaînes de caractères du
    format SMTLIB.
@@ -44,6 +45,7 @@ let str_of_test t =
 let string_repeat s n =
   Array.fold_left (^) "" (Array.make n s)
 
+
 (* Question 2. Écrire une fonction str_condition qui prend une liste
    de termes t1, ..., tk et retourne une chaîne de caractères qui
    exprime que le tuple (t1, ..., tk) est dans l'invariant.  Par
@@ -62,9 +64,11 @@ let str_of_reverse_test t =
         | Equals(t1,t2) -> "(< " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
         | LessThan(t1,t2) -> "(>= " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
 
+(* retourne la liste des variables *)
 let invar n = 
         let rec aux str i = if i > 0 then " x"^(string_of_int (n-i+1)^(aux "" (i-1))) else ""
         in "(Invar"^ (aux "" n) ^ ")";;
+
 
 (* Question 3. Écrire une fonction str_assert_for_all qui prend en
    argument un entier n et une chaîne de caractères s, et retourne
@@ -80,6 +84,7 @@ let str_assert_forall n s =
         let rec build_variables i = 
                 if i > 0 then "(x" ^ (string_of_int (n-(i-1)) ) ^ " Int) " ^ build_variables (i-1)  else ""
         in "(assert(forall ("^ (build_variables n) ^ ")"  ^ s ^")";;
+
 
 (* Question 4. Nous donnons ci-dessous une définition possible de la
    fonction smt_lib_of_wa. Complétez-la en écrivant les définitions de
@@ -119,11 +124,12 @@ let p1 = {nvars = 2;
    un autre programme test, et vérifiez qu'il donne un fichier SMTLIB
    de la forme attendue. *)
 
-let p2 = {nvars = 9;
-          inits = [(Const 3) ; (Const 1)];
-          mods = [Add ((Var 1), (Const 1)); Mult ((Var 2), (Const 2))];
-          loopcond = LessThan ((Var 1),(Const 600));
-          assertion = Equals ((Var 2),(Const 500))}
-          
-let () = Printf.printf "%s" (smtlib_of_wa p2)
+(* 3^8 *)
+let p2 = {nvars = 2;
+          inits = [(Const 1) ; (Const 1)];
+          mods = [Add ((Var 1), (Const 1)); Mult ((Var 2), (Const 3))];
+          loopcond = LessThan ((Var 1),(Const 9));
+          assertion = Equals ((Var 2),(Const 6561))}
+
+let () = Printf.printf "%s" (smtlib_of_wa p1)
 
