@@ -62,6 +62,9 @@ let str_of_reverse_test t =
         | Equals(t1,t2) -> "(< " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
         | LessThan(t1,t2) -> "(>= " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
 
+let invar n = 
+        let rec aux str i = if i > 0 then " x"^(string_of_int (n-i+1)^(aux "" (i-1))) else ""
+        in "(Invar"^ (aux "" n) ^ ")";;
 
 (* Question 3. Écrire une fonction str_assert_for_all qui prend en
    argument un entier n et une chaîne de caractères s, et retourne
@@ -89,7 +92,7 @@ let smtlib_of_wa p =
     ^"(declare-fun Invar (" ^ string_repeat "Int " n ^  ") Bool)" in
   let loop_condition p =
     "; la relation Invar est un invariant de boucle\n"
-    ^ str_assert_forall p.nvars ("=> (and" ^ str_condition p.mods ^ str_of_test p.loopcond) (* doing *) in
+    ^ str_assert_forall p.nvars ("=> (and" ^ (invar p.nvars) ^ str_of_test p.loopcond) (* doing *) in
   let initial_condition p =
     "; la relation Invar est vraie initialement\n"
     ^str_assert (str_condition p.inits) in
