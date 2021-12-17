@@ -22,6 +22,7 @@ type program = {nvars : int;
 
 let x n = "x" ^ string_of_int n
 
+
 (* Question 1. Écrire des fonctions `str_of_term` et `str_of_term` qui
    convertissent des termes et des tests en chaînes de caractères du
    format SMTLIB.
@@ -44,6 +45,7 @@ let str_of_test t =
 let string_repeat s n =
   Array.fold_left (^) "" (Array.make n s)
 
+
 (* Question 2. Écrire une fonction str_condition qui prend une liste
    de termes t1, ..., tk et retourne une chaîne de caractères qui
    exprime que le tuple (t1, ..., tk) est dans l'invariant.  Par
@@ -56,6 +58,16 @@ let rec str_condition_bis l str =
   | e::l' -> str ^ " " ^ str_of_term e ^ str_condition_bis l' str
 
 let str_condition l = "(Invar" ^ str_condition_bis l "" ^ ")"
+
+let str_of_reverse_test t = 
+        match t with
+        | Equals(t1,t2) -> "(< " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
+        | LessThan(t1,t2) -> "(>= " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
+
+(* retourne la liste des variables *)
+let invar n = 
+        let rec aux str i = if i > 0 then " x"^(string_of_int (n-i+1)^(aux "" (i-1))) else ""
+        in "(Invar"^ (aux "" n) ^ ")";;
 
 
 (* Question 3. Écrire une fonction str_assert_for_all qui prend en
@@ -71,7 +83,8 @@ let str_assert s = "(assert " ^ s ^ ")"
 let str_assert_forall n s = 
         let rec build_variables i = 
                 if i > 0 then "(x" ^ (string_of_int (n-(i-1)) ) ^ " Int) " ^ build_variables (i-1)  else ""
-        in "(forall ("^ (build_variables n)  ^ s ^"))";;
+        in "(assert(forall ("^ (build_variables n) ^ ")"  ^ s ^")";;
+
 
 (* Question 4. Nous donnons ci-dessous une définition possible de la
    fonction smt_lib_of_wa. Complétez-la en écrivant les définitions de
@@ -84,13 +97,13 @@ let smtlib_of_wa p =
     ^"(declare-fun Invar (" ^ string_repeat "Int " n ^  ") Bool)" in
   let loop_condition p =
     "; la relation Invar est un invariant de boucle\n"
-    ^ str_assert_forall p.nvars ("=> (and" ^ str_condition p.mods ^ str_of_test p.loopcond) (* doing *) in
+    ^ str_assert_forall p.nvars ("(=> (and" ^ (invar p.nvars) ^ str_of_test p.loopcond) ^ str_condition p.mods ^ ")))"(* doing *) in
   let initial_condition p =
     "; la relation Invar est vraie initialement\n"
     ^str_assert (str_condition p.inits) in
   let assertion_condition p =
     "; l'assertion finale est vérifiée\n"
-    ^ "TODO" (* À compléter *) in
+    ^ str_assert_forall p.nvars ("(=> (and "^ (invar p.nvars)  ^ (str_of_reverse_test p.loopcond) ^ ")" ^ (str_of_test p.assertion)  ^"))" )  in
   let call_solver =
     "; appel au solveur\n(check-sat-using (then qe smt))\n(get-model)\n(exit)\n" in
   String.concat "\n" [declare_invariant p.nvars;
@@ -105,13 +118,18 @@ let p1 = {nvars = 2;
           loopcond = LessThan ((Var 1),(Const 3));
           assertion = Equals ((Var 2),(Const 9))}
 
-
-let () = Printf.printf "%s" (smtlib_of_wa p1)
-
 (* Question 5. Vérifiez que votre implémentation donne un fichier
    SMTLIB qui est équivalent au fichier que vous avez écrit à la main
    dans l'exercice 1. Ajoutez dans la variable p2 ci-dessous au moins
    un autre programme test, et vérifiez qu'il donne un fichier SMTLIB
    de la forme attendue. *)
 
-let p2 = None (* À compléter *)
+(* 3^8 *)
+let p2 = {nvars = 2;
+          inits = [(Const 1) ; (Const 1)];
+          mods = [Add ((Var 1), (Const 1)); Mult ((Var 2), (Const 3))];
+          loopcond = LessThan ((Var 1),(Const 9));
+          assertion = Equals ((Var 2),(Const 6561))}
+
+let () = Printf.printf "%s" (smtlib_of_wa p1)
+
