@@ -57,6 +57,11 @@ let rec str_condition_bis l str =
 
 let str_condition l = "(Invar" ^ str_condition_bis l "" ^ ")"
 
+let str_of_reverse_test t = 
+        match t with
+        | Equals(t1,t2) -> "(< " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
+        | LessThan(t1,t2) -> "(>= " ^ str_of_term t1 ^ " " ^ str_of_term t2 ^ ")"
+
 
 (* Question 3. Écrire une fonction str_assert_for_all qui prend en
    argument un entier n et une chaîne de caractères s, et retourne
@@ -71,7 +76,7 @@ let str_assert s = "(assert " ^ s ^ ")"
 let str_assert_forall n s = 
         let rec build_variables i = 
                 if i > 0 then "(x" ^ (string_of_int (n-(i-1)) ) ^ " Int) " ^ build_variables (i-1)  else ""
-        in "(forall ("^ (build_variables n)  ^ s ^"))";;
+        in "(assert(forall ("^ (build_variables n) ^ ")"  ^ s ^")))";;
 
 (* Question 4. Nous donnons ci-dessous une définition possible de la
    fonction smt_lib_of_wa. Complétez-la en écrivant les définitions de
@@ -90,7 +95,7 @@ let smtlib_of_wa p =
     ^str_assert (str_condition p.inits) in
   let assertion_condition p =
     "; l'assertion finale est vérifiée\n"
-    ^ "TODO" (* À compléter *) in
+    ^ str_assert_forall p.nvars ("(=> (and "^ (str_of_reverse_test p.loopcond)^ (str_of_test p.assertion)  ^"))" )  in
   let call_solver =
     "; appel au solveur\n(check-sat-using (then qe smt))\n(get-model)\n(exit)\n" in
   String.concat "\n" [declare_invariant p.nvars;
